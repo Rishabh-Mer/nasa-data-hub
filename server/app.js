@@ -10,12 +10,16 @@ var indexRouter = require('./routes/index');
 const apodRouter = require('./routes/APOD');
 const marsRoverRouter = require('./routes/MarsRover');
 const neoRouter = require('./routes/Neo');
-const donkiRouter = require('./routes/DONKI');
+const epicRouter = require('./routes/Epic');
 var usersRouter = require('./routes/users');
 
 var app = express();
 const cors = require('cors')
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Your React app's URL
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,7 +36,7 @@ app.use('/apod', apodRouter);
 app.use('/mars', marsRoverRouter);
 app.use('/users', usersRouter);
 app.use("/neo", neoRouter);
-app.use("/donki", donkiRouter);
+app.use("/epic", epicRouter); 
 
 
 // catch 404 and forward to error handler

@@ -15,14 +15,11 @@ import {
   Container,
   IconButton,
   Button,
-  Divider,
-  List,
-  ListItem,
-  ListItemText
+  Divider
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Facebook, Twitter, Instagram, GitHub } from "@mui/icons-material";
-import { Star, Public, SatelliteAlt, Rocket, Science } from "@mui/icons-material";
+import { Star, Public, SatelliteAlt, Rocket, Science, Language, Explore, Person, CameraAlt } from "@mui/icons-material";
 
 import Carina from "../images/Carina.jpg";
 
@@ -66,12 +63,12 @@ function IndexPage() {
       icon: <Rocket fontSize="large" />
     },
     { 
-      title: 'Space Weather (DONKI)', 
-      path: '/donki',
-      description: 'Monitor space weather events and solar activities',
-      color: '#2980B9',
-      icon: <Science fontSize="large" />
-    },
+    title: 'Earth Polychromatic Imaging Camera', 
+    path: '/epic',
+    description: 'Daily imagery of Earth captured by DSCOVR satellite',
+    color: '#1A5276',  // Earth blue
+    icon: <CameraAlt fontSize="large" />
+  },
   ];
 
   const stats = [
@@ -81,15 +78,31 @@ function IndexPage() {
     { value: 'Open', label: 'API Access' }
   ];
 
-  const nasaSections = [
-    { title: 'Humans In Space', items: ['Artemis Program', 'International Space Station', 'Commercial Crew'] },
-    { title: 'Earth', items: ['Climate Change', 'Earth Science', 'Natural Disasters'] },
-    { title: 'Our Solar System', items: ['Planets', 'Moons', 'Asteroids & Comets'] },
-    { title: 'Universe', items: ['Galaxies', 'Black Holes', 'Dark Matter'] },
-    { title: 'Science', items: ['Astrophysics', 'Heliophysics', 'Planetary Science'] },
-    { title: 'Missions', items: ['Current Missions', 'Future Missions', 'Past Missions'] },
-    { title: 'Aeronautics', items: ['Aviation Safety', 'Supersonic Flight', 'UAS Integration'] },
-    { title: 'Technology', items: ['Space Tech', 'Robotics', '3D Printing'] }
+  const nasaTopics = [
+    { 
+      title: 'Solar System', 
+      url: 'https://science.nasa.gov/solar-system/',
+      icon: <Language fontSize="large" />,
+      color: '#8E44AD'
+    },
+    { 
+      title: 'NASA Missions', 
+      url: 'https://www.nasa.gov/nasa-missions/',
+      icon: <Rocket fontSize="large" />,
+      color: '#0B3D91'
+    },
+    { 
+      title: 'Universe', 
+      url: 'https://science.nasa.gov/universe/',
+      icon: <Explore fontSize="large" />,
+      color: '#2980B9'
+    },
+    { 
+      title: 'Humans in Space', 
+      url: 'https://www.nasa.gov/humans-in-space/',
+      icon: <Person fontSize="large" />,
+      color: '#C1440E'
+    }
   ];
 
   return (
@@ -209,73 +222,7 @@ function IndexPage() {
           </Box>
         </Zoom>
 
-        {/* NASA Sections */}
-        <Fade in={isVisible} timeout={1500}>
-          <Box sx={{ 
-            bgcolor: 'rgba(11, 61, 145, 0.3)',
-            borderRadius: 3,
-            p: 4,
-            mb: 8,
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(79, 172, 254, 0.2)'
-          }}>
-            <Typography 
-              variant="h4" 
-              align="center"
-              sx={{ 
-                mb: 4,
-                fontWeight: 600,
-                background: 'linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-            >
-              Explore NASA Topics
-            </Typography>
-            
-            <Grid container spacing={4}>
-              {nasaSections.map((section, index) => (
-                <Grid item xs={12} sm={6} md={3} key={index}>
-                  <Box>
-                    <Typography variant="h6" sx={{ 
-                      mb: 2,
-                      color: '#4facfe',
-                      textAlign: 'center'
-                    }}>
-                      {section.title}
-                    </Typography>
-                    <Divider sx={{ 
-                      bgcolor: 'rgba(79, 172, 254, 0.5)',
-                      mb: 2 
-                    }} />
-                    <List dense>
-                      {section.items.map((item, itemIndex) => (
-                        <ListItem key={itemIndex} sx={{ 
-                          py: 0,
-                          '&:hover': {
-                            bgcolor: 'rgba(79, 172, 254, 0.1)'
-                          }
-                        }}>
-                          <ListItemText 
-                            primary={item} 
-                            sx={{ 
-                              textAlign: 'center',
-                              '& .MuiTypography-root': {
-                                fontSize: '0.875rem'
-                              }
-                            }} 
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Fade>
-
-        {/* Cards Grid */}
+        {/* Explore NASA Data Section (Moved Up) */}
         <Box sx={{ mb: 10 }}>
           <Typography 
             variant="h4" 
@@ -392,7 +339,106 @@ function IndexPage() {
           </Grid>
         </Box>
 
-        {/* Features Section - Centered as requested */}
+        {/* NASA Topics Section (Now Below Explore NASA Data) */}
+        <Fade in={isVisible} timeout={1500}>
+          <Box sx={{ 
+            bgcolor: 'rgba(11, 61, 145, 0.3)',
+            borderRadius: 3,
+            p: 4,
+            mb: 8,
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(79, 172, 254, 0.2)'
+          }}>
+            <Typography 
+              variant="h4" 
+              align="center" 
+              sx={{ 
+                mb: 6,
+                fontWeight: 600,
+                background: 'linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              Explore NASA Topics
+            </Typography>
+            
+            <Grid container spacing={4} justifyContent="center">
+              {nasaTopics.map((topic, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <Grow in={isVisible} timeout={800 + (index * 200)}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        borderRadius: 3,
+                        overflow: 'hidden',
+                        boxShadow: `0 10px 30px -5px rgba(0, 0, 0, 0.5)`,
+                        transition: 'transform 0.3s, box-shadow 0.3s',
+                        '&:hover': {
+                          transform: 'translateY(-10px)',
+                          boxShadow: `0 15px 40px -5px rgba(0, 0, 0, 0.7)`,
+                        }
+                      }}
+                    >
+                      <CardActionArea 
+                        onClick={() => window.open(topic.url, '_blank')}
+                        sx={{ height: '100%' }}
+                      >
+                        <Box 
+                          sx={{ 
+                            height: '200px',
+                            background: `linear-gradient(135deg, ${topic.color} 0%, ${darkenColor(topic.color, 20)} 100%)`,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <Box 
+                            component="div"
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
+                              opacity: 0.3
+                            }}
+                          />
+                          <Box sx={{ 
+                            color: 'white',
+                            mb: 2,
+                            zIndex: 1
+                          }}>
+                            {topic.icon}
+                          </Box>
+                          <Typography 
+                            variant="h5" 
+                            align="center"
+                            sx={{ 
+                              fontWeight: 700, 
+                              zIndex: 1,
+                              color: 'white',
+                              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                              px: 2
+                            }}
+                          >
+                            {topic.title}
+                          </Typography>
+                        </Box>
+                      </CardActionArea>
+                    </Card>
+                  </Grow>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Fade>
+
+        {/* Features Section - Centered */}
         <Zoom in={isVisible} timeout={1500}>
           <Box sx={{ 
             bgcolor: 'rgba(11, 61, 145, 0.3)',
@@ -401,7 +447,7 @@ function IndexPage() {
             mb: 8,
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(79, 172, 254, 0.2)',
-            textAlign: 'center' // Added to center content
+            textAlign: 'center'
           }}>
             <Typography 
               variant="h4" 
