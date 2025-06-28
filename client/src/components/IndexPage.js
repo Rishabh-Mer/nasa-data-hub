@@ -22,6 +22,10 @@ import { Facebook, Twitter, Instagram, GitHub } from "@mui/icons-material";
 import { Star, Public, SatelliteAlt, Rocket, Science, Language, Explore, Person, CameraAlt } from "@mui/icons-material";
 
 import Carina from "../images/Carina.jpg";
+import SolarSystem from "../images/solar_system.webp";
+import Mission from "../images/mission.jpg";
+import Humans from "../images/buzz.webp";
+import Universe from "../images/universe.png";
 
 function IndexPage() {
   const navigate = useNavigate();
@@ -72,36 +76,33 @@ function IndexPage() {
   ];
 
   const stats = [
-    { value: '50+', label: 'NASA Missions' },
-    { value: 'Millions', label: 'Cosmic Images' },
-    { value: '24/7', label: 'Live Data' },
-    { value: 'Open', label: 'API Access' }
+    { value: '1000+', label: 'Exoplanets Discovered' },
+    { value: '36', label: 'Active NASA Missions' },
+    { value: '3 Billion+', label: 'Astronomical Images Collected' },
+    { value: '100%', label: 'Free & Open Space Data' }
   ];
 
+
   const nasaTopics = [
-    { 
-      title: 'Solar System', 
+    {
+      title: 'Solar System',
       url: 'https://science.nasa.gov/solar-system/',
-      icon: <Language fontSize="large" />,
-      color: '#8E44AD'
+      image: SolarSystem,
     },
-    { 
-      title: 'NASA Missions', 
+    {
+      title: 'NASA Missions',
       url: 'https://www.nasa.gov/nasa-missions/',
-      icon: <Rocket fontSize="large" />,
-      color: '#0B3D91'
+      image: Mission,
     },
-    { 
-      title: 'Universe', 
+    {
+      title: 'Universe',
       url: 'https://science.nasa.gov/universe/',
-      icon: <Explore fontSize="large" />,
-      color: '#2980B9'
+      image: Universe,
     },
-    { 
-      title: 'Humans in Space', 
+    {
+      title: 'Humans in Space',
       url: 'https://www.nasa.gov/humans-in-space/',
-      icon: <Person fontSize="large" />,
-      color: '#C1440E'
+      image: Humans,
     }
   ];
 
@@ -380,50 +381,41 @@ function IndexPage() {
                         }
                       }}
                     >
-                      <CardActionArea 
+                      <CardActionArea
                         onClick={() => window.open(topic.url, '_blank')}
-                        sx={{ height: '100%' }}
+                        sx={{
+                          height: 350,
+                          width: 220,
+                          position: 'relative',
+                          backgroundImage: `url(${topic.image})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                        }}
                       >
-                        <Box 
-                          sx={{ 
-                            height: '200px',
-                            background: `linear-gradient(135deg, ${topic.color} 0%, ${darkenColor(topic.color, 20)} 100%)`,
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            backgroundColor: 'rgba(0,0,0,0.5)'
+                          }}
+                        />
+                        <Box
+                          sx={{
                             position: 'relative',
-                            overflow: 'hidden',
+                            zIndex: 1,
+                            height: '100%',
                             display: 'flex',
-                            flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}
                         >
-                          <Box 
-                            component="div"
+                          <Typography
+                            variant="h5"
                             sx={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
-                              opacity: 0.3
-                            }}
-                          />
-                          <Box sx={{ 
-                            color: 'white',
-                            mb: 2,
-                            zIndex: 1
-                          }}>
-                            {topic.icon}
-                          </Box>
-                          <Typography 
-                            variant="h5" 
-                            align="center"
-                            sx={{ 
-                              fontWeight: 700, 
-                              zIndex: 1,
                               color: 'white',
-                              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                              px: 2
+                              fontWeight: 700,
+                              textAlign: 'center',
+                              textShadow: '1px 1px 6px rgba(0,0,0,0.6)'
                             }}
                           >
                             {topic.title}
@@ -559,7 +551,7 @@ function IndexPage() {
                   p: 3,
                   bgcolor: 'rgba(0, 0, 0, 0.2)',
                   borderRadius: 2,
-                  height: '100%'
+                  height: '75%'
                 }}>
                   <Typography variant="h6" sx={{ mb: 1, color: '#4facfe' }}>
                     Artemis Mission Updates
@@ -570,23 +562,20 @@ function IndexPage() {
                   </Typography>
                   <Button 
                     size="small" 
-                    sx={{ 
-                      color: '#4facfe',
-                      textTransform: 'none'
-                    }}
+                    sx={{ color: '#4facfe', textTransform: 'none' }}
                     onClick={() => window.open('https://www.nasa.gov/artemis', '_blank')}
                   >
                     Read More
                   </Button>
                 </Box>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <Box sx={{ 
                   p: 3,
                   bgcolor: 'rgba(0, 0, 0, 0.2)',
                   borderRadius: 2,
-                  height: '100%'
+                  height: '75%'
                 }}>
                   <Typography variant="h6" sx={{ mb: 1, color: '#4facfe' }}>
                     James Webb Discoveries
@@ -597,10 +586,7 @@ function IndexPage() {
                   </Typography>
                   <Button 
                     size="small" 
-                    sx={{ 
-                      color: '#4facfe',
-                      textTransform: 'none'
-                    }}
+                    sx={{ color: '#4facfe', textTransform: 'none' }}
                     onClick={() => window.open('https://www.nasa.gov/webb', '_blank')}
                   >
                     Read More
@@ -652,19 +638,6 @@ function IndexPage() {
               Start your journey through NASA's incredible data today. Whether you're a space enthusiast, 
               educator, student, or developer, there's something amazing to discover.
             </Typography>
-            <Button 
-              variant="contained" 
-              size="large"
-              sx={{
-                bgcolor: '#0B3D91',
-                '&:hover': { bgcolor: '#1A4DA8' },
-                px: 6,
-                py: 1.5
-              }}
-              onClick={() => navigate('/apod')}
-            >
-              Begin Exploration
-            </Button>
           </Box>
         </Fade>
       </Container>
@@ -731,6 +704,9 @@ function IndexPage() {
             </Grid>
           </Grid>
         </Container>
+        <Typography  variant="body2" sx={{textAlign:"center", mt:2, opacity: 0.7}}>
+           Developed by Rishabh Mer
+        </Typography>
       </Box>
     </Box>
   )

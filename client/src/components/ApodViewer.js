@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { fetchApod } from "../api/APOD";
 import ApodDetailDialog from "./ApodDetailDialog";
-import { 
-  Typography, 
-  ImageList, 
-  ImageListItem, 
-  ImageListItemBar, 
-  IconButton, 
+import {
+  Typography,
   Box,
-  CircularProgress,
   Paper,
+  IconButton,
+  ImageListItemBar,
+  CircularProgress,
   Container
 } from '@mui/material';
 import InfoIcon from "@mui/icons-material/Info";
 import { styled } from '@mui/material/styles';
 
-const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
-  transition: 'transform 0.3s',
-  '&:hover': {
-    transform: 'scale(1.02)',
-    boxShadow: theme.shadows[4]
-  },
+const StyledCard = styled(Paper)(({ theme }) => ({
+  position: 'relative',
+  width: '100%',
+  height: '600px',
+  overflow: 'hidden',
+  borderRadius: theme.spacing(2),
+  backgroundColor: '#FC3D21', // NASA red background
+  border: '4px solid #FF0000', // Red border highlight
+  boxShadow: theme.shadows[6],
 }));
 
+const StyledImage = styled('img')({
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  cursor: 'pointer'
+});
+
 const ApodViewer = () => {
-  const [apod, setApod] = useState([]);
+  const [apod, setApod] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -36,7 +44,8 @@ const ApodViewer = () => {
     const getApod = async () => {
       try {
         const data = await fetchApod();
-        setApod(data);
+        const oneImage = Array.isArray(data) ? data[0] : data;
+        setApod(oneImage);
       } catch (err) {
         setError(err.message || 'Failed to load APOD');
       } finally {
@@ -54,26 +63,28 @@ const ApodViewer = () => {
     );
   }
 
-  if (error) {
+  if (error || !apod) {
     return (
       <Typography align="center" color="error" mt={4}>
-        Error: {error}
+        Error: {error || "Image not available"}
       </Typography>
     );
   }
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0B3D91 0%, #1A237E 100%)',
-      color: 'white',
-      pt: 8,
-      pb: 4
-    }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#0D1B2A', // deep navy background
+        color: 'white',
+        pt: 8,
+        pb: 4
+      }}
+    >
       <Container maxWidth="md">
-        <Typography 
-          variant="h4" 
-          align="center" 
+        <Typography
+          variant="h4"
+          align="center"
           gutterBottom
           sx={{
             mb: 6,
@@ -84,54 +95,36 @@ const ApodViewer = () => {
             textShadow: '0 0 20px rgba(79, 172, 254, 0.5)'
           }}
         >
-          Astronomy Pictures of the Day
+          Astronomy Picture of the Day
         </Typography>
 
-        <Paper elevation={6} sx={{ 
-          p: 2, 
-          mb: 4,
-          background: 'rgba(11, 61, 145, 0.3)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(79, 172, 254, 0.2)'
-        }}>
-          <ImageList sx={{ width: '100%', height: 500 }}>
-            {apod.map((img) => (
-              <StyledImageListItem key={img.url || img.thumbnail_url}>
-                <img
-                  src={img.url || img.thumbnail_url}
-                  alt={img.title}
-                  loading="lazy"
-                  style={{
-                    borderRadius: '12px',
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => openDialog(img)}
-                />
-                <ImageListItemBar
-                  sx={{
-                    borderBottomLeftRadius: '12px',
-                    borderBottomRightRadius: '12px',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)'
-                  }}
-                  title={img.title}
-                  subtitle={img.copyright ? `© ${img.copyright}` : ''}
-                  actionIcon={
-                    <IconButton
-                      sx={{ color: '#4facfe' }}
-                      onClick={() => openDialog(img)}
-                      aria-label={`info about ${img.title}`}
-                    >
-                      <InfoIcon />
-                    </IconButton>
-                  }
-                />
-              </StyledImageListItem>
-            ))}
-          </ImageList>
-        </Paper>
+        <StyledCard elevation={8}>
+          <StyledImage
+            src={apod.url || apod.thumbnail_url}
+            alt={apod.title}
+            onClick={() => openDialog(apod)}
+          />
+
+          <ImageListItemBar
+            sx={{
+              borderBottomLeftRadius: '16px',
+              borderBottomRightRadius: '16px',
+              background:
+                'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0) 100%)'
+            }}
+            title={apod.title}
+            subtitle={apod.copyright ? `© ${apod.copyright}` : ''}
+            actionIcon={
+              <IconButton
+                sx={{ color: '#fff' }}
+                onClick={() => openDialog(apod)}
+                aria-label={`info about ${apod.title}`}
+              >
+                <InfoIcon />
+              </IconButton>
+            }
+          />
+        </StyledCard>
 
         {selectedImage && (
           <ApodDetailDialog

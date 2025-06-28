@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)(() => ({
   '& .MuiPaper-root': {
     backgroundColor: 'rgba(11, 61, 145, 0.85)',
     backdropFilter: 'blur(10px)',
