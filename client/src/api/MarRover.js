@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:9000/mars";
+const API_BASE_URL = "https://nasa-server-t7to.onrender.com/mars";
 
 export const fetchMarsRover = async (rover, earthDate) => {
     try {
