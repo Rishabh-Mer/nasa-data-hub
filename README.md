@@ -100,7 +100,7 @@ npm install
 Create a `.env` file in the `client/` directory:
 
 ```env
-REACT_APP_API_BASE_URL=http://localhost:9000/
+REACT_APP_API_BASE_URL="http://localhost:9000/"
 ```
 
 ### 4. Start the Client
