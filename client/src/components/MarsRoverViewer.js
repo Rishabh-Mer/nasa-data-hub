@@ -1,184 +1,228 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import {
-  Box,
-  Grid,
-  Typography,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Chip,
-  ToggleButtonGroup,
-  ToggleButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Divider,
-  CircularProgress,
-  Card,
-  CardContent,
+import React, { useState, useEffect } from "react";
+import { fetchMarsRover } from "../api/MarRover";
+import { 
+  Typography, 
+  Grid, 
+  TextField, 
+  Button, 
+  Card, 
+  CardContent, 
   CardActionArea,
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  Image as ImageIcon,
-  Videocam as VideoIcon,
-  Audiotrack as AudioIcon,
-  Close as CloseIcon,
-  PlayArrow as PlayIcon,
-} from '@mui/icons-material';
+  Container,
+  Box,
+  CircularProgress,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
+} from "@mui/material";
+import MarsRoverImagesDialog from "./MarsRoverImagesDialog";
 
-function NasaMediaLibrary() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchError, setSearchError] = useState(false);
-  const [mediaTypes, setMediaTypes] = useState(['image', 'video', 'audio']);
-  const [results, setResults] = useState({ image: [], video: [], audio: [] });
-  const [selectedItem, setSelectedItem] = useState(null);
+const MarsRoverViewer = () => {
+  const [marsImages, setMarsImages] = useState([]);
+  const [rover, setRover] = useState("curiosity");
+  const [earthDate, setEarthDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const fetchVideoData = async (item) => {
-    try {
-      const response = await axios.get(item.href);
-      const mp4Links = response.data.filter(link => link.endsWith('.mp4'));
-      const thumbnails = response.data.filter(link => link.endsWith('.jpg') || link.endsWith('.png'));
-      return {
-        ...item,
-        videoUrl: mp4Links[0] || null,
-        thumbnailUrl: thumbnails[0] || item.links?.[0]?.href
-      };
-    } catch (error) {
-      return { ...item, videoUrl: null, thumbnailUrl: item.links?.[0]?.href };
-    }
-  };
+  const [error, setError] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [rovers] = useState([
+    { name: "Curiosity", value: "curiosity" },
+    { name: "Perseverance", value: "perseverance" },
+    { name: "Opportunity", value: "opportunity" },
+    { name: "Spirit", value: "spirit" }
+  ]);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      setSearchError(true);
-      return;
-    }
-
-    setSearchError(false);
+    if (!rover || !earthDate) return;
+    
     setLoading(true);
-    setHasSearched(true);
-
+    setError("");
     try {
-      const res = await axios.get('https://images-api.nasa.gov/search', {
-        params: { q: searchQuery, media_type: mediaTypes.join(',') },
-      });
-
-      const grouped = { image: [], video: [], audio: [] };
-      const videoItems = res.data.collection.items.filter(item => item.data[0].media_type === 'video');
-      const processedVideos = await Promise.all(videoItems.map(fetchVideoData));
-      grouped.video = processedVideos.filter(video => video.videoUrl !== null);
-
-      res.data.collection.items.forEach(item => {
-        const type = item.data[0].media_type;
-        if (type !== 'video' && grouped[type]) grouped[type].push(item);
-      });
-
-      setResults(grouped);
+      const data = await fetchMarsRover(rover, earthDate);
+      setMarsImages(data.photos || []);
+      if (!data.photos || data.photos.length === 0) {
+        setError("No images found for the selected date");
+      }
     } catch (err) {
-      setResults({ image: [], video: [], audio: [] });
+      setError(err.response?.data?.error || "Failed to fetch images");
+      setMarsImages([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const renderCard = (item) => {
-    const data = item.data[0];
-    const isVideo = data.media_type === 'video';
-    const thumbnail = isVideo ? item.thumbnailUrl : item.links?.[0]?.href;
-
-    return (
-      <Card sx={{ height: '100%' }}>
-        <CardActionArea onClick={() => setSelectedItem(item)}>
-          <Box sx={{ height: 180, overflow: 'hidden', position: 'relative' }}>
-            <img
-              src={thumbnail}
-              alt={data.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-            {isVideo && <PlayIcon sx={{ position: 'absolute', top: '45%', left: '45%', fontSize: 40, color: '#fff' }} />}
-          </Box>
-          <CardContent>
-            <Typography variant="subtitle1" noWrap>{data.title}</Typography>
-            <Typography variant="body2" color="text.secondary" noWrap>{data.description || 'No description available'}</Typography>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    );
-  };
+  const openDialog = (img) => setSelectedImage(img);
+  const closeDialog = () => setSelectedImage(null);
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: '#0D1B2A', color: '#fff', px: 3, py: 4 }}>
-      <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 700 }}>NASA Media Library</Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
-        <TextField
-          fullWidth
-          placeholder="Search NASA media"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          error={searchError}
-          helperText={searchError && 'Search term is required'}
-          InputProps={{
-            startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
-            sx: { backgroundColor: '#fff', borderRadius: 1 }
+    <Box sx={{
+      minHeight: '100vh',
+      background: '#0D1B2A',
+      color: 'white',
+      pt: 8,
+      pb: 4
+    }}>
+      <Container maxWidth="lg">
+        <Typography 
+          variant="h4" 
+          align="center" 
+          gutterBottom
+          sx={{
+            mb: 6,
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            textShadow: '0 0 20px rgba(79, 172, 254, 0.5)'
           }}
-        />
-        <ToggleButtonGroup value={mediaTypes} onChange={(e, val) => val.length && setMediaTypes(val)}>
-          <ToggleButton value="image"><ImageIcon /></ToggleButton>
-          <ToggleButton value="video"><VideoIcon /></ToggleButton>
-          <ToggleButton value="audio"><AudioIcon /></ToggleButton>
-        </ToggleButtonGroup>
-        <IconButton onClick={handleSearch} sx={{ bgcolor: '#1976d2', color: '#fff', '&:hover': { bgcolor: '#1565c0' } }}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : <SearchIcon />}
-        </IconButton>
-      </Box>
+        >
+          Mars Rover Images
+        </Typography>
 
-      {hasSearched && !loading && Object.values(results).every(arr => arr.length === 0) && (
-        <Typography align="center">No results found for "{searchQuery}"</Typography>
-      )}
-
-      {['image', 'video', 'audio'].map(type => results[type].length > 0 && (
-        <Box key={type} sx={{ mt: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            {type.charAt(0).toUpperCase() + type.slice(1)}s <Chip label={results[type].length} size="small" />
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={3} justifyContent="center">
-            {results[type].map(item => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={item.data[0].nasa_id}>
-                {renderCard(item)}
-              </Grid>
-            ))}
+        <Card sx={{ 
+          p: 4, 
+          mb: 6,
+          background: 'rgba(11, 61, 145, 0.3)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(79, 172, 254, 0.2)',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+        }}>
+          <Grid container spacing={3} alignItems="center" justifyContent="center">
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Rover</InputLabel>
+                <Select
+                  value={rover}
+                  onChange={(e) => setRover(e.target.value)}
+                  sx={{
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                    },
+                  }}
+                >
+                  {rovers.map((r) => (
+                    <MenuItem key={r.value} value={r.value}>
+                      {r.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                type="date"
+                label="Earth Date"
+                InputLabelProps={{ shrink: true }}
+                value={earthDate}
+                onChange={(e) => setEarthDate(e.target.value)}
+                fullWidth
+                sx={{
+                  '& .MuiInputBase-root': {
+                    color: 'white',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleSearch}
+                disabled={!rover || !earthDate || loading}
+                sx={{
+                  height: '56px',
+                  background: 'linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)',
+                  boxShadow: '0 4px 15px rgba(79, 172, 254, 0.4)',
+                  '&:hover': {
+                    boxShadow: '0 6px 20px rgba(79, 172, 254, 0.6)'
+                  },
+                  '&:disabled': {
+                    background: 'rgba(255, 255, 255, 0.12)'
+                  }
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : 'Search'}
+              </Button>
+            </Grid>
           </Grid>
-        </Box>
-      ))}
+        </Card>
 
-      {selectedItem && (
-        <Dialog open onClose={() => setSelectedItem(null)} fullWidth maxWidth="md">
-          <DialogTitle>
-            {selectedItem.data[0].title}
-            <IconButton onClick={() => setSelectedItem(null)} sx={{ float: 'right' }}>
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            {selectedItem.data[0].media_type === 'video' ? (
-              <video src={selectedItem.videoUrl} controls style={{ width: '100%' }} />
-            ) : selectedItem.data[0].media_type === 'audio' ? (
-              <audio src={selectedItem.links[0].href} controls style={{ width: '100%' }} />
-            ) : (
-              <img src={selectedItem.links[0].href} alt={selectedItem.data[0].title} style={{ width: '100%' }} />
-            )}
-            <Typography variant="body1" sx={{ mt: 2 }}>{selectedItem.data[0].description}</Typography>
-          </DialogContent>
-        </Dialog>
-      )}
+        {loading && (
+          <Box display="flex" justifyContent="center" my={8}>
+            <CircularProgress sx={{ color: '#4facfe' }} />
+          </Box>
+        )}
+
+        {error && (
+          <Typography align="center" sx={{ my: 4, color: '#ff6b6b' }}>
+            {error}
+          </Typography>
+        )}
+
+        <Grid container spacing={4} justifyContent="center">
+          {marsImages.map((img) => (
+            <Grid item xs={12} sm={6} md={4} key={img.id}>
+              <Card sx={{ 
+                borderRadius: 3,
+                transition: 'transform 0.3s, box-shadow 0.3s',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)'
+                }
+              }}>
+                <CardActionArea onClick={() => openDialog(img)}>
+                  <Box sx={{ 
+                    position: 'relative',
+                    paddingTop: '75%', // 4:3 aspect ratio
+                    overflow: 'hidden'
+                  }}>
+                    <img
+                      src={img.img_src}
+                      alt={img.camera.full_name}
+                      loading="lazy"
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </Box>
+                  <CardContent sx={{ 
+                    background: 'rgb(2, 75, 124)',
+                    borderTop: '1px solid rgba(79, 172, 254, 0.3)'
+                  }}>
+                    <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#FFFFF' }}>
+                      {img.camera.full_name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                      {img.rover.name} Rover • {img.earth_date}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {selectedImage && (
+          <MarsRoverImagesDialog 
+            image={selectedImage} 
+            onClose={closeDialog} 
+          />
+        )}
+      </Container>
     </Box>
   );
-}
+};
 
-export default NasaMediaLibrary;
+export default MarsRoverViewer;
