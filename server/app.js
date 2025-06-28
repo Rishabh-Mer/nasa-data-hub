@@ -15,11 +15,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 const cors = require('cors')
-app.use(cors({
-  origin: 'https://nasa-data-hub.onrender.com', // Your React app's URL
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
-}));
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
